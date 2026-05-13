@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghi nhận Thành tựu Dự án</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- PptxGenJS -->
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>🏆 ACHIEVEMENT RECORDER <small style="font-size: 12px; font-weight: normal; opacity: 0.7;">v2.8</small></h1>
+            <div id="step-indicator-container" class="step-indicator hidden">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+                <div class="step">4</div>
+                <div class="step">5</div>
+                <div class="step">6</div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Step 0: Home Screen -->
+            <section id="step-0" class="step-content active-step">
+                <div class="home-screen text-center">
+                    <h2 style="font-size: 28px; margin-bottom: 16px;">Chào mừng bạn!</h2>
+                    <p style="margin-bottom: 40px;">Hãy chọn một chức năng bên dưới để bắt đầu.</p>
+                    <div class="home-actions" style="display: flex; gap: 20px; justify-content: center;">
+                        <button id="btn-home-new" class="btn btn-primary" style="padding: 16px 32px; font-size: 18px;">✨ Nhập Dự Án Mới</button>
+                        <button id="btn-home-dashboard" class="btn btn-secondary" style="padding: 16px 32px; font-size: 18px;">📊 Mở Dashboard</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step Category: Select Category -->
+            <section id="step-category" class="step-content">
+                <h2 class="text-center" style="margin-bottom: 24px;">Chọn Phân Loại Cải Tiến</h2>
+                <div class="category-grid">
+                    <div class="category-card" data-cat="Saving cost">
+                        <div class="cat-icon">💰</div>
+                        <h3>Saving cost</h3>
+                    </div>
+                    <div class="category-card" data-cat="Process improvement">
+                        <div class="cat-icon">⚙️</div>
+                        <h3>Process improvement</h3>
+                    </div>
+                    <div class="category-card" data-cat="People improvement">
+                        <div class="cat-icon">👥</div>
+                        <h3>People improvement</h3>
+                    </div>
+                    <div class="category-card" data-cat="Problem improvement">
+                        <div class="cat-icon">🛠️</div>
+                        <h3>Problem improvement</h3>
+                    </div>
+                    <div class="category-card" data-cat="Product improvement">
+                        <div class="cat-icon">📦</div>
+                        <h3>Product improvement</h3>
+                    </div>
+                    <div class="category-card" data-cat="Other improvement">
+                        <div class="cat-icon">✨</div>
+                        <h3>Other improvement</h3>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <button id="btn-cat-back" class="btn btn-secondary">⬅ Quay lại</button>
+                </div>
+            </section>
+
+            <!-- Step Dashboard -->
+            <section id="step-dashboard" class="step-content">
+                <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2>Kho Dữ Liệu Dự Án</h2>
+                    <div style="display: flex; gap: 12px;">
+                        <button id="btn-bulk-ppt" class="btn btn-primary btn-sm" style="background-color: #d24726; display: none;">📊 Xuất PPT đã chọn</button>
+                        <button id="btn-dash-back" class="btn btn-secondary btn-sm">⬅ Quay lại</button>
+                    </div>
+                </div>
+                <div id="dashboard-loading" class="text-center" style="margin: 40px 0;">
+                    <div class="spinner" style="margin: 0 auto 16px auto;"></div>
+                    <p>Đang tải dữ liệu từ Supabase...</p>
+                </div>
+                <div id="dashboard-list" class="dashboard-category-list" style="display: none;">
+                    <!-- Categories and projects will be injected here -->
+                </div>
+            </section>
+
+            <!-- Step 1: Project Info -->
+            <section id="step-1" class="step-content">
+                <h2>1. Thông tin chung</h2>
+                <p>Nhập tên dự án hoặc thành tựu bạn muốn ghi nhận.</p>
+                <div class="input-group">
+                    <label for="project-name">Tên Dự Án (Bắt buộc)</label>
+                    <input type="text" id="project-name" placeholder="Ví dụ: Triển khai hệ thống ERP...">
+                </div>
+            </section>
+
+            <!-- Step 2: Reality - Goal -->
+            <section id="step-2" class="step-content">
+                <h2>2. Reality & Goal</h2>
+                <p>Mô tả thực trạng trước khi làm và mục tiêu hướng tới.</p>
+                <div class="input-group">
+                    <label for="reality-text">Thực trạng (Reality)</label>
+                    <textarea id="reality-text" rows="3" placeholder="Ví dụ: Manual process taking 5 hours..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="goal-text">Mục tiêu (Goal)</label>
+                    <textarea id="goal-text" rows="3" placeholder="Ví dụ: Automate process to under 1 hour..."></textarea>
+                </div>
+                <div class="input-group file-upload-group">
+                    <label>Hình ảnh Thực trạng (Reality)</label>
+                    <input type="file" id="reality-image" accept="image/*" multiple>
+                    <div id="reality-image-preview" class="image-preview"></div>
+                </div>
+                <div class="input-group file-upload-group mt-3">
+                    <label>Hình ảnh Mục tiêu (Goal)</label>
+                    <input type="file" id="goal-image" accept="image/*" multiple>
+                    <div id="goal-image-preview" class="image-preview"></div>
+                </div>
+            </section>
+
+            <!-- Step 3: Solution -->
+            <section id="step-3" class="step-content">
+                <h2>3. Solution</h2>
+                <p>Các giải pháp và bước thực hiện chính.</p>
+                <div id="solution-steps-container">
+                    <div class="solution-step input-group">
+                        <label>Bước 1</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="solution-input" placeholder="Ví dụ: Define architecture..." style="flex: 1;">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-solution">+ Thêm bước</button>
+                <div class="input-group file-upload-group mt-4">
+                    <label>Sơ đồ / Hình minh họa giải pháp (Tùy chọn)</label>
+                    <input type="file" id="solution-image" accept="image/*" multiple>
+                    <div id="solution-image-preview" class="image-preview"></div>
+                </div>
+            </section>
+
+            <!-- Step 4: Roadmap -->
+            <section id="step-4" class="step-content">
+                <h2>3. Roadmap (Kế hoạch)</h2>
+                <p>Tiến độ dự án theo các mốc thời gian.</p>
+                <div id="roadmap-phases-container">
+                    <div class="roadmap-phase card-input">
+                        <div style="display: flex; gap: 8px; justify-content: space-between;">
+                            <input type="text" class="roadmap-name" placeholder="Tên giai đoạn (VD: Phase 1)" value="Phase 1" style="flex: 1;">
+                        </div>
+                        <textarea class="roadmap-desc" rows="2" placeholder="Mô tả công việc..."></textarea>
+                        <input type="text" class="roadmap-date" placeholder="Thời gian (VD: 01/2025)">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-roadmap">+ Thêm giai đoạn</button>
+            </section>
+
+            <!-- Step 5: Result -->
+            <section id="step-5" class="step-content">
+                <h2>4. Result</h2>
+                <p>Kết quả đạt được sau dự án.</p>
+                <div id="result-points-container">
+                    <div class="input-group">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="result-input" placeholder="Ví dụ: Boost productivity by minimizing downtime..." style="flex: 1;">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-result">+ Thêm kết quả</button>
+                <div class="input-group file-upload-group mt-4">
+                    <label>Tải ảnh chứng minh (Tùy chọn)</label>
+                    <input type="file" id="result-image" accept="image/*" multiple>
+                    <div id="result-image-preview" class="image-preview"></div>
+                </div>
+            </section>
+
+            <!-- Loading Overlay for submission -->
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="spinner"></div>
+                <p>Đang lưu dữ liệu và tải ảnh lên...</p>
+            </div>
+
+            <!-- Step 6: Export / Summary -->
+            <section id="step-6" class="step-content">
+                <h2>Hoàn tất!</h2>
+                <p>Dưới đây là bản tổng hợp 4 phần dự án của bạn.</p>
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                    <button id="btn-export" class="btn btn-primary export-btn">⬇ Tải Ảnh Xuống</button>
+                    <button id="btn-ppt-export" class="btn btn-primary" style="background-color: #d24726;">📊 Xuất PowerPoint</button>
+                    <button id="btn-go-home" class="btn btn-secondary">🏠 Về Trang Chủ</button>
+                    <button id="btn-new-project" class="btn btn-success">✨ Tạo Dự Án Mới</button>
+                </div>
+                
+                <div class="export-wrapper">
+                    <!-- The 4-quadrant layout matching user's image -->
+                    <div id="export-canvas" class="export-canvas">
+                        <div class="export-header">
+                            <h1 id="export-title">PROJECT TITLE HERE</h1>
+                        </div>
+                        <div class="export-grid">
+                            <!-- Top Left -->
+                            <div class="export-box bg-reality">
+                                <div class="box-title title-reality">REALITY-GOAL</div>
+                                <div class="box-content">
+                                    <div class="box-inner">
+                                        <h3 class="highlight-yellow">Reality:</h3>
+                                        <p id="export-reality-text" class="content-text"></p>
+                                        <h3 class="highlight-yellow mt-3">Goal:</h3>
+                                        <p id="export-goal-text" class="content-text"></p>
+                                        <div id="export-goal-img-container" class="export-img-container mt-2"></div>
+                                        <div id="export-reality-img-container" class="export-img-container mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Top Right -->
+                            <div class="export-box bg-solution">
+                                <div class="box-title title-solution">SOLUTION</div>
+                                <div class="box-content">
+                                    <div class="box-inner">
+                                        <div id="export-solution-steps" class="solution-flow">
+                                            <!-- Steps generated here -->
+                                        </div>
+                                        <div class="solution-bottom">
+                                            <div id="export-solution-img-container" class="export-img-container left-side"></div>
+                                            <div class="right-side">
+                                                <p id="export-solution-desc" class="content-text highlight-yellow"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Left -->
+                            <div class="export-box bg-roadmap">
+                                <div class="box-title title-roadmap">ROADMAP-ACTIONS</div>
+                                <div class="box-content">
+                                    <div class="box-inner" style="height: 100%;">
+                                        <div id="export-roadmap-container" class="roadmap-table-container">
+                                            <!-- Table generated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Right -->
+                            <div class="export-box bg-result">
+                                <div class="box-title title-result">RESULT</div>
+                                <div class="box-content result-content">
+                                    <div class="box-inner">
+                                        <ul id="export-result-list" class="content-text result-list">
+                                            <!-- Results generated here -->
+                                        </ul>
+                                        <div id="export-result-img-container" class="export-img-container mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer / Navigation -->
+        <footer id="app-footer" class="app-footer hidden">
+            <button id="btn-prev" class="btn btn-secondary hidden">Quay lại</button>
+            <button id="btn-next" class="btn btn-primary">Tiếp tục ➔</button>
+            <button id="btn-submit" class="btn btn-success hidden">Hoàn thành & Lưu ✔</button>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
