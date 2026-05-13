@@ -1,7 +1,7 @@
 // Supabase Configuration
 const SUPABASE_URL = 'https://eztcbahjrmugvytvfxqo.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_veiXSNA8lZtNgG2ky4bL8Q_JdB3dUWD'; 
-const APP_VERSION = '2.8';
+const APP_VERSION = '3.0';
 
 let supabaseClient;
 let currentStep = 0; // 0 is Home, 'dashboard' is Dashboard, 1-6 are form steps
@@ -653,15 +653,18 @@ async function addProjectSlide(pptx, project) {
         slide.addText(box.title, { x: box.x, y: box.y, w: box.w, h: 0.4, fill: { color: COLOR_TITLE_BG }, color: COLOR_TEXT, bold: true, fontSize: 18, align: 'center', fontFace: FONT });
     });
 
-    const hasRealityImgs = project.realityImageFiles && project.realityImageFiles.length > 0;
-    const hasGoalImgs = project.goalImageFiles && project.goalImageFiles.length > 0;
-    const hasSolutionImgs = project.solutionImageFiles && project.solutionImageFiles.length > 0;
-    const hasResultImgs = project.resultImageFiles && project.resultImageFiles.length > 0;
+    const hasRealityImgs = project.realityImageFiles && project.realityImageFiles.filter(f => f).length > 0;
+    const hasGoalImgs = project.goalImageFiles && project.goalImageFiles.filter(f => f).length > 0;
+    const hasSolutionImgs = project.solutionImageFiles && project.solutionImageFiles.filter(f => f).length > 0;
+    const hasResultImgs = project.resultImageFiles && project.resultImageFiles.filter(f => f).length > 0;
 
-    slide.addText('Reality:', { x: 0.25, y: 1.3, w: 0.9, h: 0.25, fill: { color: COLOR_HIGHLIGHT }, fontSize: 13, bold: true, color: '000000', fontFace: FONT });
-    slide.addText(project.realityText, { x: 0.25, y: 1.55, w: (hasRealityImgs || hasGoalImgs) ? 2.7 : 4.5, h: 0.65, fontSize: 10, color: COLOR_TEXT, fontFace: FONT, valign: 'top', shrinkText: true });
-    slide.addText('Goal:', { x: 0.25, y: 2.25, w: 0.7, h: 0.25, fill: { color: COLOR_HIGHLIGHT }, fontSize: 13, bold: true, color: '000000', fontFace: FONT });
-    slide.addText(project.goalText, { x: 0.25, y: 2.5, w: (hasRealityImgs || hasGoalImgs) ? 2.7 : 4.5, h: 0.55, fontSize: 10, color: COLOR_TEXT, fontFace: FONT, valign: 'top', shrinkText: true });
+    const leftColW = (hasRealityImgs || hasGoalImgs) ? 2.7 : 4.6;
+
+    slide.addText('Reality:', { x: 0.25, y: 1.25, w: 0.9, h: 0.25, fill: { color: COLOR_HIGHLIGHT }, fontSize: 12, bold: true, color: '000000', fontFace: FONT });
+    slide.addText(project.realityText, { x: 0.25, y: 1.5, w: leftColW, h: 0.75, fontSize: 10, color: COLOR_TEXT, fontFace: FONT, valign: 'top', shrinkText: true });
+    
+    slide.addText('Goal:', { x: 0.25, y: 2.25, w: 0.7, h: 0.25, fill: { color: COLOR_HIGHLIGHT }, fontSize: 12, bold: true, color: '000000', fontFace: FONT });
+    slide.addText(project.goalText, { x: 0.25, y: 2.5, w: leftColW, h: 0.55, fontSize: 10, color: COLOR_TEXT, fontFace: FONT, valign: 'top', shrinkText: true });
 
     const addImgsToArea = async (sources, startX, startY, maxW, maxH) => {
         if (!sources || sources.length === 0) return;
@@ -766,6 +769,7 @@ async function handleBulkPPTExport() {
                 realityText: data.reality_text,
                 goalText: data.goal_text,
                 realityImageFiles: data.reality_image_url || [],
+                goalImageFiles: data.goal_image_url || [],
                 solutionSteps: data.solution_steps ? data.solution_steps.split('\n').map(s => s.replace(/^\d+\.\s*/, '')) : [],
                 solutionImageFiles: data.solution_image_url || [],
                 roadmapPhases: [],
